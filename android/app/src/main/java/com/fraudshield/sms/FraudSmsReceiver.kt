@@ -10,12 +10,13 @@ class FraudSmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
 
-        for (message in Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-            val text = message.messageBody.orEmpty()
-            if (text.isBlank()) continue
+        val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+        if (messages.isEmpty()) return
 
-            val result = RiskEngine.analyze(text)
-            ProtectionNotifier.show(context, result)
-        }
+        val text = messages.joinToString(separator = "") { it.messageBody.orEmpty() }.trim()
+        if (text.isBlank()) return
+
+        val result = RiskEngine.analyze(text)
+        ProtectionNotifier.show(context, result)
     }
 }
