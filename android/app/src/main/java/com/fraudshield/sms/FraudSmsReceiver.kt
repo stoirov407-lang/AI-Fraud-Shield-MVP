@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
 import com.fraudshield.core.RiskEngine
+import com.fraudshield.history.ScanHistoryStore
 
 class FraudSmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -17,6 +18,7 @@ class FraudSmsReceiver : BroadcastReceiver() {
         if (text.isBlank()) return
 
         val result = RiskEngine.analyze(text)
+        ScanHistoryStore.add(context, result, text)
         ProtectionNotifier.show(context, result)
     }
 }
